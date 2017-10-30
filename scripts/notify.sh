@@ -24,6 +24,7 @@ if [ "$test_fail_cnt" -gt 0 ]; then
       message="<!here>\n $iブランチでのテストが失敗しました。 :no_entry_sign: \n $last_committer さん、確認をお願いします。 :bow: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
     fi
+  break
   done
 fi
 
@@ -34,6 +35,7 @@ if [ "$test_fail_cnt" -eq 0]; then
       message="<!here>\n 前回失敗していたdevelopブランチのテストが成功しました。 :white_check_mark: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
     fi
+  break
   done
 fi
 
