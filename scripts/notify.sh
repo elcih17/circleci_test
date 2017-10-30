@@ -18,24 +18,26 @@ SLACK_WEBHOOK_URL="https://hooks.slack.com/services/T024HQQE3/B5ZB629PT/cH5jnVa6
 TARGETS=("develop" "master")
 
 if [ "$test_fail_cnt" -gt 0 ]; then
-  for branch in "${TARGETS[@]}"; do
+  for branch in $TARGETS;
+  do
     if [[ "$CIRCLE_BRANCH" = "$branch"]]; then
       last_committer="okd"
       echo last_committer:$last_committer
       message="<!here>\n $iブランチでのテストが失敗しました。 :no_entry_sign: \n $last_committer さん、確認をお願いします。 :bow: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
-      break
+      continue 
     fi
   done
 fi
 
 # develop or masterブランチで前回のビルド結果がfailed、今回のビルド結果がfixedの場合に通知する
 if [ "$test_fail_cnt" -eq 0]; then
-  for branch in "${TARGETS[@]}"; do
+  for branch in "${TARGETS[@]}";
+    do
     if [[ "$CIRCLE_BRANCH" = "$branch"]] && [ "$PREVIOUS_BUILD_STATUS" = "failed" ]; then
       message="<!here>\n 前回失敗していたdevelopブランチのテストが成功しました。 :white_check_mark: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
-      break
+      continue
     fi
   done
 fi
