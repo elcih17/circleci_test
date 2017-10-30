@@ -39,5 +39,4 @@ if [ "$test_fail_cnt" -eq 0]; then
   done
 fi
 
-
-
+exit 0
