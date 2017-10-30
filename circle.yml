@@ -1,0 +1,5 @@
+test:
+    - ./scripts/run_e2e.sh
+  post:
+    - ./scripts/notify.sh
+
