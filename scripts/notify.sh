@@ -30,34 +30,25 @@ SLACK_WEBHOOK_URL="https://hooks.slack.com/services/T024HQQE3/B5ZB629PT/cH5jnVa6
 
 echo notify to slack: $SLACK_USER_NAME $SLACK_CHANNEL
 
-# develop or masterブランチでのテストに失敗していたら通知する
-targets=("develop" "master")
-
-if [ "$test_fail_cnt" -gt 0 ]; then
-  for branch in "${targets[@]}";
-  do
-    echo branch $branch
-    if [ "$CIRCLE_BRANCH" = "$branch" ]; then
-      last_committer="okd"
+NOTIFY_TARGETS=("develop" "master")
+# 通知対象ブランチでのテストに失敗していたら通知する
+for branch in "${NOTIFY_TARGETS[@]}";
+  if [ "$CIRCLE_BRANCH" = "$branch" ]; then
+    if [ "$test_fail_cnt" -gt 0 ]; then
+      # commit履歴を日付昇順ソートして、末尾から2番目の人を取る(末尾の人はmergeした人) hal1008とplaid-incは除く
+      last_committer=$(cat $BUILD_RESULT_FILE|jq '.all_commit_details | sort_by(.committer_date)' | grep author_name | grep -v -e hal1008 -e plaid-inc | awk -F'"' '{print $4}' | tail -n2 | head -n1)
       echo last_committer:$last_committer
       message="<!here>\n $branchブランチでのテストが失敗しました。 :no_entry_sign: \n $last_committer さん、確認をお願いします。 :bow: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
-      break 
     fi
-  done
-fi
-
-# develop or masterブランチで前回のビルド結果がfailed、今回のビルド結果がfixedの場合に通知する
-if [ "$test_fail_cnt" -eq 0 ]; then
-  for branch in "${targets[@]}";
-  do
-    echo branch $branch
-    if [ "$CIRCLE_BRANCH" = "$branch" ] && [ "$PREVIOUS_BUILD_STATUS" = "failed" ]; then
-      message="<!here>\n 前回失敗していた$branchブランチのテストが成功しました。 :white_check_mark: \n $BUILD_RESULT_URL"
+    if [ "$test_fail_cnt" -eq 0 ] && [ "$PREVIOUS_BUILD_STATUS" = "failed" ]; then
+      # develop or masterブランチで前回のビルド結果がfailed、今回のビルド結果がfixedの場合に通知する
+      message="<!here>\n 前回失敗していたdevelopブランチのテストが成功しました。:white_check_mark:  \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
-      break
     fi
-  done
-fi
+    break
+  fi
+do
+done
 
 exit 0
