@@ -33,6 +33,7 @@ echo notify to slack: $SLACK_USER_NAME $SLACK_CHANNEL
 NOTIFY_TARGETS=("develop" "master")
 # 通知対象ブランチでのテストに失敗していたら通知する
 for branch in "${NOTIFY_TARGETS[@]}";
+do
   if [ "$CIRCLE_BRANCH" = "$branch" ]; then
     if [ "$test_fail_cnt" -gt 0 ]; then
       # commit履歴を日付昇順ソートして、末尾から2番目の人を取る(末尾の人はmergeした人) hal1008とplaid-incは除く
@@ -48,7 +49,6 @@ for branch in "${NOTIFY_TARGETS[@]}";
     fi
     break
   fi
-do
 done
 
 exit 0
