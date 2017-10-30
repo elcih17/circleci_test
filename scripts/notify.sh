@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo 'notify start'
 abs_path=`echo $(cd $(dirname $0) && pwd)`
 . ${abs_path}/notify_to_slack.sh
 
@@ -23,8 +24,8 @@ if [ "$test_fail_cnt" -gt 0 ]; then
       echo last_committer:$last_committer
       message="<!here>\n $iブランチでのテストが失敗しました。 :no_entry_sign: \n $last_committer さん、確認をお願いします。 :bow: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
+      break
     fi
-  break
   done
 fi
 
@@ -34,8 +35,8 @@ if [ "$test_fail_cnt" -eq 0]; then
     if [[ "$CIRCLE_BRANCH" = "$branch"]] && [ "$PREVIOUS_BUILD_STATUS" = "failed" ]; then
       message="<!here>\n 前回失敗していたdevelopブランチのテストが成功しました。 :white_check_mark: \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
+      break
     fi
-  break
   done
 fi
 
