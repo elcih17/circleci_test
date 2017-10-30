@@ -8,6 +8,8 @@ curr_build_id=$CIRCLE_BUILD_NUM #今回のビルドID
 echo curr_build_id $curr_build_id
 BUILD_RESULT_URL="https://${CIRCLE_DOMAIN}/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${curr_build_id}"
 echo build_result_url $BUILD_RESULT_URL
+BUILD_RESULT_FILE=$CIRCLE_ARTIFACTS/circleResult.txt
+echo build_result_file $BUILD_RESULT_FILE
 
 test_fail_cnt=$(cat $BUILD_RESULT_FILE | jq '[.steps[].actions[] | select(contains({failed:true})) | .status] | length')
 echo test_fail_cnt $test_fail_cnt
