@@ -4,12 +4,22 @@ echo 'notify start'
 abs_path=`echo $(cd $(dirname $0) && pwd)`
 . ${abs_path}/notify_to_slack.sh
 
+CIRCLE_DOMAIN="circleci.com"
+API_END_POINT="https://${CIRCLE_DOMAIN}/api/v1/project/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+CIRCLE_TOKEN_PARAM="circle-token=$CIRCLE_REBUILD_TOKEN"
+
 curr_build_id=$CIRCLE_BUILD_NUM #今回のビルドID
 echo curr_build_id $curr_build_id
 BUILD_RESULT_URL="https://${CIRCLE_DOMAIN}/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${curr_build_id}"
 echo build_result_url $BUILD_RESULT_URL
 BUILD_RESULT_FILE=$CIRCLE_ARTIFACTS/circleResult.txt
 echo build_result_file $BUILD_RESULT_FILE
+
+# ビルド結果は使いまわすのでファイルに書き込む
+curl -s $API_END_POINT/$curr_build_id?$CIRCLE_TOKEN_PARAM > $BUILD_RESULT_FILE
+
+BUILD_USER_NAME=$(cat $BUILD_RESULT_FILE | jq -r '.user.login')
+PREVIOUS_BUILD_STATUS=$(cat $BUILD_RESULT_FILE | jq -r '.previous.status')
 
 test_fail_cnt=$(cat $BUILD_RESULT_FILE | jq '[.steps[].actions[] | select(contains({failed:true})) | .status] | length')
 echo test_fail_cnt $test_fail_cnt
