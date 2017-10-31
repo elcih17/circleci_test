@@ -45,7 +45,7 @@ do
     fi
     if [ "$test_fail_cnt" -eq 0 ] && [ "$PREVIOUS_BUILD_STATUS" = "failed" ]; then
       # develop or masterブランチで前回のビルド結果がfailed、今回のビルド結果がfixedの場合に通知する
-      message="<!here>\n 前回失敗していたdevelopブランチのテストが成功しました。:white_check_mark:  \n $BUILD_RESULT_URL"
+      message="<!here>\n 前回失敗していた$branchブランチのテストが成功しました。:white_check_mark:  \n $BUILD_RESULT_URL"
       notify_to_slack "$message" $SLACK_USER_NAME $SLACK_CHANNEL $SLACK_WEBHOOK_URL
       break
     fi
